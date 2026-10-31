@@ -1,0 +1,562 @@
+---
+title: "Distribución Uniforme Discreta"
+lang: es
+---
+
+```{=html}
+<style>
+main.content {
+text-align: justify}
+</style>
+```
+
+```{r}
+#| label: setup
+#| include: false
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+```
+
+<br>
+
+La **distribución uniforme discreta** es una de las distribuciones de probabilidad más elementales. Se caracteriza porque todos los valores posibles de la variable aleatoria tienen la misma probabilidad de ocurrir.
+
+::: {#def-vaunif}
+Una variable aleatoria discreta $X$ sigue una distribución uniforme discreta en el conjunto de $n$ números $\{x_1, x_2, \ldots, x_n\}$ si:
+
+\begin{equation}
+f(x) =  \begin{cases} 
+\frac{1}{n} & \text{si } x \in \{x_1, x_2, \ldots, x_n\} \\
+0 & \text{en otro caso}
+\end{cases}
+\end{equation}
+
+Para denotar que una variable aleatoria $X$ tiene distribución uniforme escribimos:
+
+\begin{equation}
+X \sim \text{unif} \{x_1, x_2, \ldots, x_n\}
+\end{equation}
+:::
+
+## Características Principales
+
+**Función de Probabilidad**
+
+\begin{equation}
+f(x) = P(X = x) = \begin{cases} 
+\frac{1}{n} & \text{si } x \in \{x_1, x_2, \ldots, x_n\} \\
+0 & \text{en otro caso}
+\end{cases}
+\end{equation}
+
+**Parámetros Estadísticos**
+
+Esperanza (Media):
+
+\begin{equation}
+E(X) = \frac{1}{n}\sum_{i=1}^n x_i = \mu
+\end{equation}
+
+Varianza:
+
+\begin{equation}
+\text{Var}(X) = \frac{1}{n}\sum_{i=1}^n (x_i-\mu)^2
+\end{equation}
+
+## Ejemplos y Aplicaciones
+
+::: {#exm-dado}
+### Lanzamiento de un dado
+
+Un dado justo representa una distribución $X\sim \text{unif} \{1, 2, 3, 4, 5, 6\}$.
+
+```{r}
+#| code-fold: true
+#| label: dado-ejemplo
+
+# Parámetros del dado
+x_1 <- 1
+x_6 <- 6
+valores <- x_1:x_6
+probabilidades <- rep(1/length(valores), length(valores))
+
+# Crear data frame
+dado_data <- data.frame(
+  Valor = valores,
+  Probabilidad = probabilidades
+)
+
+# Mostrar tabla
+kable(dado_data, 
+      caption = "Distribución de probabilidad de un dado",
+      align = "cc") %>%
+  kable_styling(bootstrap_options = "striped")
+```
+
+**Cálculo de parámetros:**
+
+```{r}
+#| code-fold: true
+#| label: parametros-dado
+# Media
+media <- sum(dado_data$Valor)/length(dado_data$Valor)
+cat("Media:", media, "\n")
+
+# Varianza
+varianza <- sum((dado_data$Valor- media)^2)/length(dado_data$Valor)
+cat("Varianza:", varianza, "\n")
+
+# Desviación estándar
+desv_std <- sqrt(varianza)
+cat("Desviación estándar:", round(desv_std, 4), "\n")
+```
+
+### Visualización
+
+```{r}
+#| code-fold: true
+#| label: grafico-dado
+#| fig-cap: "Función de probabilidad de un dado"
+
+ggplot(dado_data, aes(x = Valor, y = Probabilidad)) +
+  geom_col(fill = "steelblue", alpha = 0.7, width = 0.6) +
+  geom_text(aes(label = round(Probabilidad, 3)), vjust = -0.5) +
+  scale_x_continuous(breaks = valores) +
+  scale_y_continuous(limits = c(0, 0.20)) +
+  labs(title = "Distribución Uniforme Discreta - Dado",
+       x = "Valor",
+       y = "Probabilidad") +
+  theme_minimal() +
+  theme(
+    legend.title = element_text(size=13, face="bold"),
+    legend.text = element_text(size=13),
+    plot.title = element_text(size=15, face="bold", hjust = 0.5),
+    plot.subtitle = element_text(size=13, hjust = 0.5),
+    axis.text.x=element_text(size=12),
+    axis.text.y=element_text(size=12),
+    axis.title.x = element_text(face="bold", size=13),
+    axis.title.y = element_text(face="bold", size=13)
+    # panel.grid.major.y = element_line(color = "#ECF0F1", linewidth = 0.5,
+    #   linetype = "dashed"),
+    # panel.grid.minor.y = element_blank(),
+    # panel.grid.major.x = element_blank(),
+    # panel.background = element_rect(fill = "#FAFAFA", color = NA),
+    # plot.background = element_rect(fill = "white", color = NA)
+  )
+```
+:::
+
+::: {#exm-num_random}
+### Selección aleatoria de números
+
+Supongamos que seleccionamos aleatoriamente un número entero entre 10 y 20 (inclusive).
+
+**Cálculo de parámetros:**
+
+```{r}
+#| code-fold: true
+#| label: ejemplo-numeros
+
+x2_1 <- 10
+x2_n <- 20
+valores2 <- x2_1:x2_n
+probabilidades2 <- rep(1/(length(valores2)), length(valores2))
+
+# Data_frame
+data2 <- data.frame(
+  Valor = valores2,
+  Probabilidad = probabilidades2
+)
+
+# Parámetros estadísticos
+media2 <- mean(data2$Valor)
+varianza2 <- sum((data2$Valor - media2)^2)/length(data2$Valor)
+desv_std2 <- sqrt(varianza2)
+
+cat("Media:", media2, "\n")
+cat("Varianza:", round(varianza2, 4), "\n")
+cat("Desviación estándar:", round(desv_std2, 4), "\n")
+```
+
+**Visualización de la función de probabilidad:**
+
+```{r}
+#| label: grafico-numeros
+#| code-fold: true
+#| fig-align: "center"
+#| fig-cap: "Distribución uniforme discreta entre 10 y 20"
+
+
+ggplot(data2, aes(x = Valor, y = Probabilidad)) +
+  geom_col(fill = "darkgreen", alpha = 0.7, width = 0.8) +
+  geom_text(aes(label = round(Probabilidad, 3)), 
+            vjust = -0.5, size = 3) +
+  scale_x_continuous(breaks = seq(10, 20, 1)) +
+  labs(title = "Distribución Uniforme Discreta",
+       x = "Valor",
+       y = "Probabilidad") +
+  theme_minimal() +
+  theme(
+    legend.title = element_text(size=13, face="bold"),
+    legend.text = element_text(size=13),
+    plot.title = element_text(size=15, face="bold", hjust = 0.5),
+    plot.subtitle = element_text(size=13, hjust = 0.5),
+    axis.text.x=element_text(size=12),
+    axis.text.y=element_text(size=12),
+    axis.title.x = element_text(face="bold", size=13),
+    axis.title.y = element_text(face="bold", size=13)
+    # panel.grid.major.y = element_line(color = "#ECF0F1", linewidth = 0.5,
+    #   linetype = "dashed"),
+    # panel.grid.minor.y = element_blank(),
+    # panel.grid.major.x = element_blank(),
+    # panel.background = element_rect(fill = "#FAFAFA", color = NA),
+    # plot.background = element_rect(fill = "white", color = NA)
+  )
+```
+:::
+
+::: {#exm-simulacion}
+### Simulación en R
+
+Generación de números aleatorios de una variable aleatoria $X\sim unif\{1, 2, 3, 4, 5, 6\}$ y comparación con las probabilidades teóricas.
+
+```{r}
+#| code-fold: true
+#| label: simulacion
+
+# Generar 1000 números aleatorios
+n_sim <- 1000
+muestra <- sample(1:6, n_sim, replace = TRUE)
+
+# Frecuencias observadas
+freq_obs <- table(muestra)
+freq_rel <- prop.table(freq_obs)
+
+# Comparar con probabilidades teóricas
+comparacion <- data.frame(
+  Valor = 1:6,
+  Prob_Teorica = rep(1/6, 6),
+  Freq_Observada = as.numeric(freq_rel)
+)
+
+kable(comparacion, 
+      caption = "Comparación entre probabilidades teóricas y observadas",
+      col.names = c("Valor", "Prob. Teórica", "Freq. Observada"),
+      digits = 4) |> 
+  kable_styling(bootstrap_options = "striped")
+```
+
+<br>
+
+**Visualización de la simulación**
+
+```{r}
+#| code-fold: true
+#| label: grafico-simulacion
+#| fig-width: 8
+#| fig-height: 6
+#| fig-align: "center"
+#| fig-cap: "Comparación entre distribución teórica y simulada"
+
+
+
+ggplot(comparacion) +
+  geom_col(aes(x=Valor, y=Freq_Observada),alpha = 0.7, fill="firebrick") +
+  scale_x_continuous(breaks = 1:6) +
+  geom_hline(yintercept = 1/6, color = "blue", linetype = "dashed", linewidth = 1) +
+  annotate("text", x=3.5, y=1/6 + 0.01, label="Probabilidad Teórica = 1/6", color = "black", size=5) +
+  labs(title = paste("Simulación con", n_sim, "observaciones"),
+       x = "Valor",
+       y = "Probabilidad") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "bottom")
+```
+:::
+
+## Aplicaciones Prácticas
+
+La distribución uniforme discreta tiene múltiples aplicaciones:
+
+1.  **Juegos de azar**: Dados, ruletas, sorteos
+2.  **Muestreo**: Selección aleatoria de elementos
+3.  **Simulación**: Generación de números aleatorios equiprobables
+4.  **Investigación**: Asignación aleatoria de tratamientos
+
+## Propiedades Importantes
+
+### Relación con otras distribuciones
+
+- Caso especial de la distribución categórica con probabilidades iguales
+- Límite discreto de la distribución uniforme continua
+- Base para generar otras distribuciones discretas
+
+### Teorema Central del Límite
+
+Verifiquemos el Teorema Central del Límite mediante simulación para el caso de variables aleatorias con distribución uniforme discreta.
+
+Generaremos $k=1000$ muestras cada una de tamaño $n=30$ de una distribución uniforme discreta en el conjunto $\{1, 2, 3, 4, 5, 6\}$ y observaremos la distribución de sus medias muestrales. En el @exm-dado se obtuvo que para $X\sim \text{unif}\{1, 2, 3, 4, 5, 6\}$ tenemos $\mu=7/2$ y $\sigma^2= 35/12$, luego la media muestral:
+
+$$\bar{X}_{30}=\frac{1}{30}\sum_{i=1}^{30} X_i$$ Tendrá aproximadamente la siguiente distribución:
+
+$$\bar{X}_n \sim N\left(\mu, \frac{\sigma^2}{n} \right)$$
+
+Es decir
+
+$$\bar{X}_{30} \sim N\left(\frac{7}{2}, \frac{7}{72} \right)$$
+
+```{r}
+#| code-fold: true
+#| label: limite-central
+#| fig-width: 8
+#| fig-height: 6
+#| fig-align: "center"
+#| fig-cap: "Verificación del Teorema Central del Límite"
+# Simular medias muestrales
+
+k_muestra <- 1000
+n_muestra <- 30
+
+medias_muestrales <- replicate(k_muestra, {
+  muestra <- sample(1:6, n_muestra, replace = TRUE)
+  mean(muestra)
+})
+
+# Crear histograma
+hist_data <- data.frame(Medias = medias_muestrales)
+
+ggplot(hist_data) +
+  geom_histogram(aes(x=Medias, after_stat(density)), bins = 30, 
+                 fill = "lightblue", alpha = 0.7, color = "black") +
+  geom_density(aes(x = Medias), color = "red", linewidth = 1) +
+  geom_vline(xintercept = mean(medias_muestrales), 
+             color = "blue", linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribución de Medias Muestrales",
+       subtitle = paste("n =", n_muestra, " de una v.a. uniforme(1,6)"),
+       x = "Media Muestral",
+       y = "Densidad") +
+  theme_minimal() +
+  theme(
+    legend.title = element_text(size=13, face="bold"),
+    legend.text = element_text(size=13),
+    plot.title = element_text(size=15, face="bold", hjust = 0.5),
+    plot.subtitle = element_text(size=13, hjust = 0.5),
+    axis.text.x=element_text(size=12),
+    axis.text.y=element_text(size=12),
+    axis.title.x = element_text(face="bold", size=13),
+    axis.title.y = element_text(face="bold", size=13)
+    # panel.grid.major.y = element_line(color = "#ECF0F1", linewidth = 0.5,
+    #   linetype = "dashed"),
+    # panel.grid.minor.y = element_blank(),
+    # panel.grid.major.x = element_blank(),
+    # panel.background = element_rect(fill = "#FAFAFA", color = NA),
+    # plot.background = element_rect(fill = "white", color = NA)
+  )
+
+# Estadísticas
+cat("Media teórica:", (1+6)/2, "\n")
+cat("Media observada:", round(mean(medias_muestrales), 4), "\n")
+cat("Varianza teórica de la media:", round(((6-1+1)^2-1)/12/n_muestra, 4), "\n")
+cat("Varianza observada de la media:", round(var(medias_muestrales), 4), "\n")
+```
+
+## Ejercicios Propuestos
+
+::: {#exr-simulacion_1}
+Simular 500 observaciones de una distribución uniforme discreta en {0, 1, 2, 3, 4} y compara las frecuencias observadas con las teóricas.
+:::
+
+**Solución:**
+
+Sea $X\sim \text{unif}\{0, 1, 2, 3, 4\}$. Como $n=5$, cada valor tiene probabilidad teórica $f(x)=1/5=0.2$, y en 500 observaciones esperamos $500/5=100$ apariciones de cada valor. Además:
+
+$$\mu = \frac{0+1+2+3+4}{5}=2, \qquad \sigma^2=\frac{(0-2)^2+(1-2)^2+(2-2)^2+(3-2)^2+(4-2)^2}{5}=2.$$
+
+```{r}
+#| code-fold: true
+#| label: ej1-simulacion
+
+set.seed(2026)
+
+# Parámetros: X ~ unif{0, 1, 2, 3, 4}
+valores_e1 <- 0:4
+n_sim_e1 <- 500
+
+# Simulación
+muestra_e1 <- sample(valores_e1, n_sim_e1, replace = TRUE)
+
+# Frecuencias observadas (factor para incluir todos los valores)
+freq_abs_e1 <- table(factor(muestra_e1, levels = valores_e1))
+freq_rel_e1 <- prop.table(freq_abs_e1)
+
+# Comparar con lo teórico
+comparacion_e1 <- data.frame(
+  Valor = valores_e1,
+  Prob_Teorica = rep(1/length(valores_e1), length(valores_e1)),
+  Freq_Relativa = as.numeric(freq_rel_e1),
+  Esperada = n_sim_e1 / length(valores_e1),
+  Observada = as.numeric(freq_abs_e1)
+)
+
+kable(comparacion_e1,
+      caption = "Comparación entre frecuencias teóricas y observadas (500 observaciones)",
+      col.names = c("Valor", "Prob. Teórica", "Freq. Relativa Observada",
+                    "Freq. Absoluta Esperada", "Freq. Absoluta Observada"),
+      digits = 4,
+      align = "ccccc") |>
+  kable_styling(bootstrap_options = "striped")
+```
+
+<br>
+
+```{r}
+#| code-fold: true
+#| label: ej1-grafico
+#| fig-width: 8
+#| fig-height: 6
+#| fig-align: "center"
+#| fig-cap: "Frecuencias relativas observadas vs. probabilidad teórica"
+
+ggplot(comparacion_e1) +
+  geom_col(aes(x = Valor, y = Freq_Relativa), alpha = 0.7, fill = "firebrick") +
+  geom_text(aes(x = Valor, y = Freq_Relativa, label = round(Freq_Relativa, 3)),
+            vjust = -0.5) +
+  scale_x_continuous(breaks = valores_e1) +
+  geom_hline(yintercept = 1/5, color = "blue", linetype = "dashed", linewidth = 1) +
+  labs(title = paste("Simulación con", n_sim_e1, "observaciones"),
+       subtitle = "Línea azul punteada: probabilidad teórica = 1/5",
+       x = "Valor",
+       y = "Probabilidad") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = 12, hjust = 0.5),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(face = "bold", size = 13),
+        axis.title.y = element_text(face = "bold", size = 13))
+```
+
+Comparamos también la media y la varianza de la muestra con los valores teóricos, y aplicamos una prueba $\chi^2$ de bondad de ajuste para verificar si las diferencias entre las frecuencias observadas y las esperadas se pueden atribuir al azar:
+
+```{r}
+#| code-fold: true
+#| label: ej1-resumen
+
+cat("Media teórica:", 2, "\n")
+cat("Media observada:", round(mean(muestra_e1), 4), "\n")
+cat("Varianza teórica:", 2, "\n")
+cat("Varianza observada:", round(var(muestra_e1), 4), "\n\n")
+
+# Prueba chi-cuadrada de bondad de ajuste (H0: la distribución es uniforme)
+prueba_e1 <- chisq.test(freq_abs_e1, p = rep(1/5, 5))
+prueba_e1
+```
+
+Si el valor $p$ es mayor que $0.05$, no hay evidencia para rechazar que los datos provengan de una distribución uniforme discreta en $\{0,1,2,3,4\}$: las diferencias observadas son las esperables por la variabilidad del muestreo. En esta simulación (con la semilla fijada) se obtuvo $p\approx 0.092$, por lo que no se rechaza la hipótesis de uniformidad; además, la media observada ($\approx 2.02$) y la varianza observada ($\approx 2.10$) son cercanas a los valores teóricos ($\mu=2$ y $\sigma^2=2$). Al aumentar el número de observaciones, las frecuencias relativas se acercan cada vez más a $0.2$.
+
+::: {#exr-simulacion_2}
+Generar $k=1000$ muestras de tamaño $n=50$ de una distribución uniforme discreta en $\{1, 2, \dots, 9, 10\}$ y verificar el Teorema Central del Límite para las medias muestrales.
+:::
+
+**Solución:**
+
+Sea $X\sim \text{unif}\{1, 2, \dots, 10\}$. Sus parámetros son:
+
+$$\mu=\frac{1+2+\cdots+10}{10}=\frac{11}{2}=5.5, \qquad \sigma^2=\frac{10^2-1}{12}=\frac{33}{4}=8.25.$$
+
+Por el Teorema Central del Límite, la media muestral $\bar{X}_{50}=\frac{1}{50}\sum_{i=1}^{50}X_i$ tiene aproximadamente la distribución:
+
+$$\bar{X}_{50} \sim N\left(\mu, \frac{\sigma^2}{n}\right)=N\left(\frac{11}{2}, \frac{33}{200}\right)=N(5.5,\ 0.165).$$
+
+```{r}
+#| code-fold: true
+#| label: ej2-tcl
+
+set.seed(2026)
+
+k_e2 <- 1000
+n_e2 <- 50
+valores_e2 <- 1:10
+
+# Parámetros teóricos
+mu_e2 <- mean(valores_e2)
+sigma2_e2 <- sum((valores_e2 - mu_e2)^2) / length(valores_e2)
+
+# k medias muestrales, cada una de una muestra de tamaño n
+medias_e2 <- replicate(k_e2, {
+  muestra <- sample(valores_e2, n_e2, replace = TRUE)
+  mean(muestra)
+})
+
+hist_e2 <- data.frame(Medias = medias_e2)
+```
+
+```{r}
+#| code-fold: true
+#| label: ej2-grafico
+#| fig-width: 10
+#| fig-height: 5
+#| fig-align: "center"
+#| fig-cap: "Verificación del Teorema Central del Límite: histograma de las medias muestrales y gráfico Q-Q"
+
+g_hist <- ggplot(hist_e2) +
+  geom_histogram(aes(x = Medias, after_stat(density)), bins = 30,
+                 fill = "lightblue", alpha = 0.7, color = "black") +
+  geom_density(aes(x = Medias), color = "red", linewidth = 1) +
+  stat_function(fun = dnorm, args = list(mean = mu_e2, sd = sqrt(sigma2_e2 / n_e2)),
+                color = "blue", linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribución de Medias Muestrales",
+       subtitle = paste("n =", n_e2, "de una v.a. uniforme(1,10); azul: N(5.5, 0.165)"),
+       x = "Media Muestral",
+       y = "Densidad") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = 11, hjust = 0.5),
+        axis.title.x = element_text(face = "bold", size = 13),
+        axis.title.y = element_text(face = "bold", size = 13))
+
+g_qq <- ggplot(hist_e2, aes(sample = Medias)) +
+  stat_qq(color = "steelblue", alpha = 0.6) +
+  stat_qq_line(color = "red", linewidth = 1) +
+  labs(title = "Gráfico Q-Q normal",
+       x = "Cuantiles teóricos",
+       y = "Cuantiles muestrales") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.title.x = element_text(face = "bold", size = 13),
+        axis.title.y = element_text(face = "bold", size = 13))
+
+grid.arrange(g_hist, g_qq, ncol = 2)
+
+# Estadísticas
+cat("Media teórica:", mu_e2, "\n")
+cat("Media observada:", round(mean(medias_e2), 4), "\n")
+cat("Varianza teórica de la media:", round(sigma2_e2 / n_e2, 4), "\n")
+cat("Varianza observada de la media:", round(var(medias_e2), 4), "\n")
+```
+
+Otra forma de verificar la aproximación normal es comparar la proporción de medias muestrales que caen a 1, 2 y 3 errores estándar ($\sigma/\sqrt{n}$) de $\mu$ con las probabilidades que asigna la distribución normal (la "regla empírica" 68-95-99.7):
+
+```{r}
+#| code-fold: true
+#| label: ej2-cobertura
+
+ee_e2 <- sqrt(sigma2_e2 / n_e2)   # error estándar de la media
+c_sd <- 1:3
+
+cobertura_e2 <- data.frame(
+  Intervalo = paste0("μ ± ", c_sd, "·σ/√n"),
+  Normal = pnorm(c_sd) - pnorm(-c_sd),
+  Observada = sapply(c_sd, function(c) mean(abs(medias_e2 - mu_e2) <= c * ee_e2))
+)
+
+kable(cobertura_e2,
+      caption = "Proporción de medias muestrales dentro de cada intervalo",
+      col.names = c("Intervalo", "Probabilidad normal", "Proporción observada"),
+      digits = 4,
+      align = "lcc") |>
+  kable_styling(bootstrap_options = "striped")
+```
+
+La media de las medias muestrales ($\approx 5.52$) es muy cercana a $\mu=5.5$ y su varianza ($\approx 0.172$) es cercana a $\sigma^2/n=0.165$. La prueba de Shapiro-Wilk da $p\approx 0.49$, por lo que no se rechaza la normalidad de las medias muestrales. El histograma sigue la curva normal teórica (línea azul punteada) y, en el gráfico Q-Q, los puntos se alinean con la recta. Esto confirma el Teorema Central del Límite: aunque la distribución original es uniforme discreta (plana y con solo 10 valores), la distribución de la media muestral con $n=50$ es aproximadamente normal.
